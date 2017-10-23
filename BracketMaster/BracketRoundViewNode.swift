@@ -11,7 +11,7 @@ import AsyncDisplayKit
 
 final class BracketRoundViewNode: ASDisplayNode {
     
-    static let defaultSpacing: CGFloat = 30
+    static let defaultSpacing: CGFloat = 0
     
     lazy var collectionLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -25,7 +25,7 @@ final class BracketRoundViewNode: ASDisplayNode {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = BracketRoundMatchNode.height + BracketRoundViewNode.defaultSpacing * 2
+        layout.minimumLineSpacing = BracketRoundMatchNode.height
         return layout
     }()
     

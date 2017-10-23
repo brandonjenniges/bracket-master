@@ -128,7 +128,7 @@ extension BracketViewController: BracketRoundSrollDelegate {
             if round == controller {
                 continue
             }
-            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2 + BracketRoundViewNode.defaultSpacing / 2)
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
             round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
             
@@ -141,7 +141,7 @@ extension BracketViewController: BracketRoundSrollDelegate {
                 round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: true)
                 continue
             }
-            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2 + BracketRoundViewNode.defaultSpacing / 2)
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
         
             UIView.animate(withDuration: 0.3, animations: {

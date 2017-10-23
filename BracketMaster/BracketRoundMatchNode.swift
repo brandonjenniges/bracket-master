@@ -11,19 +11,31 @@ import AsyncDisplayKit
 
 final class BracketRoundMatchNode: ASCellNode {
     
-    static let height: CGFloat = 80
-    private let contentNode = ASDisplayNode()
+    enum MatchPosition {
+        case top
+        case bottom
+        case unknown
+    }
     
-    override init() {
+    static let height: CGFloat = 100
+    static let contentHeight: CGFloat = 75
+    
+    private let contentNode = ASDisplayNode()
+    private let matchPosition: MatchPosition
+    
+    init(matchPosition: MatchPosition) {
+        self.matchPosition = matchPosition
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
-        self.contentNode.backgroundColor = UIColor.random()
+        self.contentNode.backgroundColor = matchPosition == .top ? .red : .blue
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        contentNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: BracketRoundMatchNode.height)
-        let insetSpec = ASInsetLayoutSpec(insets: .zero, child: contentNode)
+        contentNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: BracketRoundMatchNode.contentHeight)
+        let centerSpec = ASCenterLayoutSpec(centeringOptions: .Y, sizingOptions: .minimumY, child: self.contentNode)
+        centerSpec.style.preferredSize = CGSize(width: constrainedSize.max.width, height: BracketRoundMatchNode.height)
+        let insetSpec = ASInsetLayoutSpec(insets: .zero, child: centerSpec)
         return insetSpec
     }
 }

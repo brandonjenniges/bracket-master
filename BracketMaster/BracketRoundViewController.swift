@@ -50,20 +50,7 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: {
                 [weak self] viewingStatus in
-                if let weakSelf = self {
-//                    switch viewingStatus {
-//                    case .leading:
-//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.spacedLayout, animated: true)
-//                        break
-//                    case .trailing:
-//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
-//                        break
-//                    case .current:
-//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
-//                        break
-//                    }
-                    weakSelf.mainNode.collectionNode.isUserInteractionEnabled = viewingStatus == .current
-                }
+                self?.mainNode.collectionNode.isUserInteractionEnabled = viewingStatus == .current
             })
             .addDisposableTo(disposeBag)
     }
@@ -76,7 +63,7 @@ extension BracketRoundViewController: ASCollectionDataSource {
     
     func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
         return { () -> ASCellNode in
-            let node = BracketRoundMatchNode()
+            let node = BracketRoundMatchNode(matchPosition: indexPath.item % 2 == 0 ? .top : .bottom)
             return node
         }
         

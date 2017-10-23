@@ -11,7 +11,7 @@ import AsyncDisplayKit
 
 final class BracketViewNode: ASDisplayNode {
     
-    let OFFSET_PERCENT: CGFloat = 0.8
+    let OFFSET_PERCENT: CGFloat = 0.9
     
     lazy var pagerNode: ASCollectionNode = {
         let layout = UICollectionViewFlowLayout()
