@@ -40,7 +40,11 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
                 [weak self] active in
                 if let weakSelf = self {
                     weakSelf.mainNode.collectionNode.isUserInteractionEnabled = active
-                    weakSelf.mainNode.collectionNode.relayoutItems()
+                    if active {
+                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
+                    } else {
+                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.spacedLayout, animated: true)
+                    }
                 }
             })
             .addDisposableTo(disposeBag)
@@ -59,23 +63,17 @@ extension BracketRoundViewController: ASCollectionDataSource {
             node.selectionStyle = .none
             let displayNode = ASDisplayNode()
             displayNode.backgroundColor = UIColor.random()
-            
-            DispatchQueue.main.async {
-                displayNode.borderWidth = 2
-                displayNode.layer.borderColor = UIColor.random().cgColor
-                
-            }
+//            
+//            DispatchQueue.main.async {
+//                displayNode.borderWidth = 2
+//                displayNode.layer.borderColor = UIColor.random().cgColor
+//                
+//            }
             node.addSubnode(displayNode)
             node.layoutSpecBlock = {
                 node, constrainedSize in
                 displayNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: 200)
-                let inset: UIEdgeInsets
-                if self.isActive.value {
-                    inset = .zero
-                } else {
-                    inset = UIEdgeInsetsMake(0, 0, 200, 0)
-                }
-                let insetSpec = ASInsetLayoutSpec(insets: inset, child: displayNode)
+                let insetSpec = ASInsetLayoutSpec(insets: .zero, child: displayNode)
                 return insetSpec
             }
             return node

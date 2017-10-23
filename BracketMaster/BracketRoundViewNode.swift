@@ -11,12 +11,24 @@ import AsyncDisplayKit
 
 final class BracketRoundViewNode: ASDisplayNode {
     
-    lazy var collectionNode: ASCollectionNode = {
+    lazy var collectionLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
-        return ASCollectionNode(collectionViewLayout: layout)
+        return layout
+    }()
+    
+    lazy var spacedLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 200
+        return layout
+    }()
+    
+    lazy var collectionNode: ASCollectionNode = {
+        return ASCollectionNode(collectionViewLayout: self.collectionLayout)
     }()
     
     override init() {

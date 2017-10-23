@@ -84,7 +84,7 @@ class BracketViewController: ASViewController<ASDisplayNode> {
         
         if  recognizer.state == .began {
             
-            if translation.x > 0 {
+            if translation.x >= 0 {
                 print("left")
                 if self.currentPage.value == 0 {
                     // Tried to swipe left on first page
@@ -102,7 +102,7 @@ class BracketViewController: ASViewController<ASDisplayNode> {
                 self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
             }
             let newActive = self.rounds[self.currentPage.value]
-            self.roundDidScroll(newActive, scrollView: newActive.mainNode.collectionNode.view)
+            //self.roundDidScroll(newActive, scrollView: newActive.mainNode.collectionNode.view)
         }
         
     }
@@ -116,6 +116,12 @@ extension BracketViewController: BracketRoundSrollDelegate {
                 continue
             }
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - 100)
+            print("Offset: \(newOffset)")
+            
+            // Need to figure this out, this isn't a good check
+            if newOffset.y < -200 {
+                return
+            }
             round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
         }
     }
