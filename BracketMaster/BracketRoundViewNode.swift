@@ -28,7 +28,7 @@ final class BracketRoundViewNode: ASDisplayNode {
     }()
     
     lazy var collectionNode: ASCollectionNode = {
-        return ASCollectionNode(collectionViewLayout: self.collectionLayout)
+        return ASCollectionNode(collectionViewLayout: self.spacedLayout)
     }()
     
     override init() {
@@ -36,6 +36,7 @@ final class BracketRoundViewNode: ASDisplayNode {
         self.automaticallyManagesSubnodes = true
         self.collectionNode.view.showsVerticalScrollIndicator = false
         self.collectionNode.view.showsHorizontalScrollIndicator = false
+        self.collectionNode.view.contentInsetAdjustmentBehavior = .never
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {

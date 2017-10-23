@@ -10,7 +10,7 @@ import AsyncDisplayKit
 import RxSwift
 
 class BracketViewController: ASViewController<ASDisplayNode> {
-
+    
     let mainNode = BracketViewNode()
     lazy var pageSize: CGFloat = {
         CGFloat(self.view.bounds.size.width * self.mainNode.OFFSET_PERCENT)
@@ -19,9 +19,9 @@ class BracketViewController: ASViewController<ASDisplayNode> {
     let currentPage: Variable<Int> = Variable(0)
     private let disposeBag = DisposeBag()
     
-    let roundSize = [8,4,2,1]
+    let roundSize = [64, 32, 16, 8,4,2,1]
     lazy var rounds: [BracketRoundViewController] = {
-        [BracketRoundViewController(matches: 8, bracketRoundDelgate: self), BracketRoundViewController(matches: 4, bracketRoundDelgate: self), BracketRoundViewController(matches: 2, bracketRoundDelgate: self), BracketRoundViewController(matches: 1, bracketRoundDelgate: self)]
+        [BracketRoundViewController(matches: 64, bracketRoundDelgate: self), BracketRoundViewController(matches: 32, bracketRoundDelgate: self),BracketRoundViewController(matches: 16, bracketRoundDelgate: self),BracketRoundViewController(matches: 8, bracketRoundDelgate: self),  BracketRoundViewController(matches: 4, bracketRoundDelgate: self), BracketRoundViewController(matches: 2, bracketRoundDelgate: self), BracketRoundViewController(matches: 1, bracketRoundDelgate: self)]
     }()
     
     var translationX:CGFloat = 0
@@ -34,20 +34,21 @@ class BracketViewController: ASViewController<ASDisplayNode> {
     init() {
         super.init(node: self.mainNode)
         self.mainNode.pagerNode.dataSource = self
-        self.mainNode.pagerNode.delegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.addPanGesture()
-        // Set first controller as active
-        self.rounds.first?.isActive.value = true
         self.setupCurrentPageObservable()
+        
+        DispatchQueue.main.async {
+            let newActive = self.rounds[self.currentPage.value]
+            self.roundDidChange(newActive, scrollView: newActive.mainNode.collectionNode.view)
+        }
     }
     
     // MARK: -- Rx
@@ -65,7 +66,13 @@ class BracketViewController: ASViewController<ASDisplayNode> {
     
     private func updateActiveRound(with currentPage: Int) {
         for (index, round) in self.rounds.enumerated() {
-            round.isActive.value = index == currentPage
+            if index == currentPage {
+                round.viewingStatus.value = .current
+            } else if index < currentPage {
+                round.viewingStatus.value = .trailing
+            } else {
+                round.viewingStatus.value = .leading
+            }
         }
     }
     
@@ -91,7 +98,6 @@ class BracketViewController: ASViewController<ASDisplayNode> {
                     return
                 }
                 self.currentPage.value = self.currentPage.value - 1
-                self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
             } else {
                 print("right")
                 if self.currentPage.value == self.rounds.count - 1 {
@@ -99,10 +105,10 @@ class BracketViewController: ASViewController<ASDisplayNode> {
                     return
                 }
                 self.currentPage.value = self.currentPage.value + 1
-                self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
             }
             let newActive = self.rounds[self.currentPage.value]
-            //self.roundDidScroll(newActive, scrollView: newActive.mainNode.collectionNode.view)
+            self.roundDidChange(newActive, scrollView: newActive.mainNode.collectionNode.view)
+            self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
         }
         
     }
@@ -115,14 +121,36 @@ extension BracketViewController: BracketRoundSrollDelegate {
             if round == controller {
                 continue
             }
-            let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - 100)
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -100
+            let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
             print("Offset: \(newOffset)")
             
             // Need to figure this out, this isn't a good check
             if newOffset.y < -200 {
-                return
+                //  return
             }
+            
             round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
+            
+        }
+    }
+    
+    func roundDidChange(_ controller: BracketRoundViewController, scrollView: UIScrollView) {
+        for round in self.rounds {
+            if round == controller {
+                continue
+            }
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -100
+            let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
+            print("Offset: \(newOffset)")
+            
+            // Need to figure this out, this isn't a good check
+            if newOffset.y < -200 {
+                //  return
+            }
+            
+            round.mainNode.collectionNode.setContentOffset(newOffset, animated: true)
+            
         }
     }
 }
