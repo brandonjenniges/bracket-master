@@ -18,7 +18,9 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
     let isActive: Variable<Bool> = Variable(false)
     private let disposeBag = DisposeBag()
     
-    init(bracketRoundDelgate: BracketRoundSrollDelegate) {
+    var matches: Int // temp
+    init(matches: Int, bracketRoundDelgate: BracketRoundSrollDelegate) {
+        self.matches = matches
         self.bracketRoundDelgate = bracketRoundDelgate
         super.init(node: self.mainNode)
         self.mainNode.collectionNode.dataSource = self
@@ -38,6 +40,7 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
                 [weak self] active in
                 if let weakSelf = self {
                     weakSelf.mainNode.collectionNode.isUserInteractionEnabled = active
+                    weakSelf.mainNode.collectionNode.relayoutItems()
                 }
             })
             .addDisposableTo(disposeBag)
@@ -46,7 +49,7 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
 
 extension BracketRoundViewController: ASCollectionDataSource {
     func collectionNode(_ collectionNode: ASCollectionNode, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return self.matches
     }
     
     func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
@@ -65,8 +68,14 @@ extension BracketRoundViewController: ASCollectionDataSource {
             node.addSubnode(displayNode)
             node.layoutSpecBlock = {
                 node, constrainedSize in
-                displayNode.style.preferredSize = CGSize(width: self.view.bounds.size.width, height: 200)
-                let insetSpec = ASInsetLayoutSpec(insets: .zero, child: displayNode)
+                displayNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: 200)
+                let inset: UIEdgeInsets
+                if self.isActive.value {
+                    inset = .zero
+                } else {
+                    inset = UIEdgeInsetsMake(0, 0, 200, 0)
+                }
+                let insetSpec = ASInsetLayoutSpec(insets: inset, child: displayNode)
                 return insetSpec
             }
             return node

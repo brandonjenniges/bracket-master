@@ -19,8 +19,9 @@ class BracketViewController: ASViewController<ASDisplayNode> {
     let currentPage: Variable<Int> = Variable(0)
     private let disposeBag = DisposeBag()
     
+    let roundSize = [8,4,2,1]
     lazy var rounds: [BracketRoundViewController] = {
-        [BracketRoundViewController(bracketRoundDelgate: self), BracketRoundViewController(bracketRoundDelgate: self), BracketRoundViewController(bracketRoundDelgate: self), BracketRoundViewController(bracketRoundDelgate: self)]
+        [BracketRoundViewController(matches: 8, bracketRoundDelgate: self), BracketRoundViewController(matches: 4, bracketRoundDelgate: self), BracketRoundViewController(matches: 2, bracketRoundDelgate: self), BracketRoundViewController(matches: 1, bracketRoundDelgate: self)]
     }()
     
     var translationX:CGFloat = 0
@@ -100,6 +101,8 @@ class BracketViewController: ASViewController<ASDisplayNode> {
                 self.currentPage.value = self.currentPage.value + 1
                 self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
             }
+            let newActive = self.rounds[self.currentPage.value]
+            self.roundDidScroll(newActive, scrollView: newActive.mainNode.collectionNode.view)
         }
         
     }
@@ -112,7 +115,8 @@ extension BracketViewController: BracketRoundSrollDelegate {
             if round == controller {
                 continue
             }
-            round.mainNode.collectionNode.setContentOffset(scrollView.contentOffset, animated: false)
+            let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - 100)
+            round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
         }
     }
 }
