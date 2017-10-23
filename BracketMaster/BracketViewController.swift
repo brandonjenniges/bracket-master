@@ -91,24 +91,31 @@ class BracketViewController: ASViewController<ASDisplayNode> {
         
         if  recognizer.state == .began {
             
+            let newValue: Int
             if translation.x >= 0 {
                 print("left")
                 if self.currentPage.value == 0 {
                     // Tried to swipe left on first page
                     return
                 }
-                self.currentPage.value = self.currentPage.value - 1
+                newValue = self.currentPage.value - 1
             } else {
                 print("right")
                 if self.currentPage.value == self.rounds.count - 1 {
                     // Tried to swipe right on last page
                     return
                 }
-                self.currentPage.value = self.currentPage.value + 1
+                newValue = self.currentPage.value + 1
             }
+            
+            self.currentPage.value = newValue
             let newActive = self.rounds[self.currentPage.value]
-            self.roundDidChange(newActive, scrollView: newActive.mainNode.collectionNode.view)
-            self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: self.currentPage.value, section: 0), at: .left, animated: true)
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                self.roundDidChange(newActive, scrollView: newActive.mainNode.collectionNode.view)
+                self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: newValue, section: 0), at: .left, animated: false)
+            }, completion: { (finished) in
+            })
         }
         
     }
@@ -121,15 +128,8 @@ extension BracketViewController: BracketRoundSrollDelegate {
             if round == controller {
                 continue
             }
-            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -100
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2 + BracketRoundViewNode.defaultSpacing / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
-            print("Offset: \(newOffset)")
-            
-            // Need to figure this out, this isn't a good check
-            if newOffset.y < -200 {
-                //  return
-            }
-            
             round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
             
         }
@@ -138,19 +138,30 @@ extension BracketViewController: BracketRoundSrollDelegate {
     func roundDidChange(_ controller: BracketRoundViewController, scrollView: UIScrollView) {
         for round in self.rounds {
             if round == controller {
+                round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: true)
                 continue
             }
-            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -100
+            let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2 + BracketRoundViewNode.defaultSpacing / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
-            print("Offset: \(newOffset)")
-            
-            // Need to figure this out, this isn't a good check
-            if newOffset.y < -200 {
-                //  return
-            }
-            
-            round.mainNode.collectionNode.setContentOffset(newOffset, animated: true)
-            
+        
+            UIView.animate(withDuration: 0.3, animations: {
+                switch round.viewingStatus.value {
+                case .leading:
+                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.spacedLayout, animated: false)
+                    break
+                case .trailing:
+                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: false)
+                    break
+                case .current:
+                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: false)
+                    break
+                }
+                round.mainNode.collectionNode.contentOffset = newOffset
+            }, completion: { (finished) in
+                if finished {
+                    round.mainNode.collectionNode.contentOffset = newOffset
+                }
+            })
         }
     }
 }

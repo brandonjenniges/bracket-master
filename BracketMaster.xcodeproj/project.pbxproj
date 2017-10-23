@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		730C7DC7A706A7022CDF95D0 /* Pods_BracketMaster.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A9265E36A2C21B65169ECE /* Pods_BracketMaster.framework */; };
+		CA477D511F9E7BCD0036CC68 /* BracketRoundMatchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA477D501F9E7BCD0036CC68 /* BracketRoundMatchNode.swift */; };
 		CA5B23E81F9951FE0048FD70 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5B23E71F9951FE0048FD70 /* AppDelegate.swift */; };
 		CA5B23EA1F9951FE0048FD70 /* BracketViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5B23E91F9951FE0048FD70 /* BracketViewController.swift */; };
 		CA5B23EF1F9951FE0048FD70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CA5B23EE1F9951FE0048FD70 /* Assets.xcassets */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		30A9265E36A2C21B65169ECE /* Pods_BracketMaster.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BracketMaster.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BEAC67D0B57F7AA5399BB5D /* Pods-BracketMaster.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketMaster.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BracketMaster/Pods-BracketMaster.debug.xcconfig"; sourceTree = "<group>"; };
+		CA477D501F9E7BCD0036CC68 /* BracketRoundMatchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BracketRoundMatchNode.swift; sourceTree = "<group>"; };
 		CA5B23E41F9951FE0048FD70 /* BracketMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BracketMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA5B23E71F9951FE0048FD70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CA5B23E91F9951FE0048FD70 /* BracketViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BracketViewController.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				CAE9F3581F9A5CF600460D27 /* BracketRoundViewController.swift */,
 				CAE9F35A1F9A5D4F00460D27 /* BracketRoundViewNode.swift */,
 				CAE9F35C1F9A632600460D27 /* BracketRoundScrollDelegate.swift */,
+				CA477D501F9E7BCD0036CC68 /* BracketRoundMatchNode.swift */,
 			);
 			path = BracketMaster;
 			sourceTree = "<group>";
@@ -245,6 +248,7 @@
 				CAE9F3551F9A51EB00460D27 /* BracketViewModel.swift in Sources */,
 				CAE9F35D1F9A632600460D27 /* BracketRoundScrollDelegate.swift in Sources */,
 				CA5B23E81F9951FE0048FD70 /* AppDelegate.swift in Sources */,
+				CA477D511F9E7BCD0036CC68 /* BracketRoundMatchNode.swift in Sources */,
 				CAE9F35B1F9A5D4F00460D27 /* BracketRoundViewNode.swift in Sources */,
 				CAE9F3531F9A502100460D27 /* BracketViewNode.swift in Sources */,
 			);

@@ -40,27 +40,28 @@ final class BracketRoundViewController: ASViewController<ASDisplayNode> {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.mainNode.collectionNode.contentOffset = CGPoint(x: 0, y: -100)
+        self.mainNode.collectionNode.contentOffset = CGPoint(x: 0, y:  -(BracketRoundMatchNode.height / 2 + BracketRoundViewNode.defaultSpacing / 2))
     }
     
     // MARK: -- Rx
     
     private func setupViewingStatusObservable() {
         self.viewingStatus.asObservable()
+            .observeOn(MainScheduler.instance)
             .subscribe(onNext: {
                 [weak self] viewingStatus in
                 if let weakSelf = self {
-                    switch viewingStatus {
-                    case .leading:
-                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.spacedLayout, animated: true)
-                        break
-                    case .trailing:
-                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
-                        break
-                    case .current:
-                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
-                        break
-                    }
+//                    switch viewingStatus {
+//                    case .leading:
+//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.spacedLayout, animated: true)
+//                        break
+//                    case .trailing:
+//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
+//                        break
+//                    case .current:
+//                        weakSelf.mainNode.collectionNode.view.setCollectionViewLayout(weakSelf.mainNode.collectionLayout, animated: true)
+//                        break
+//                    }
                     weakSelf.mainNode.collectionNode.isUserInteractionEnabled = viewingStatus == .current
                 }
             })
@@ -75,24 +76,7 @@ extension BracketRoundViewController: ASCollectionDataSource {
     
     func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
         return { () -> ASCellNode in
-            let node = ASCellNode()
-            
-            node.selectionStyle = .none
-            let displayNode = ASDisplayNode()
-            displayNode.backgroundColor = UIColor.random()
-            //
-            //            DispatchQueue.main.async {
-            //                displayNode.borderWidth = 2
-            //                displayNode.layer.borderColor = UIColor.random().cgColor
-            //
-            //            }
-            node.addSubnode(displayNode)
-            node.layoutSpecBlock = {
-                node, constrainedSize in
-                displayNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: 200)
-                let insetSpec = ASInsetLayoutSpec(insets: .zero, child: displayNode)
-                return insetSpec
-            }
+            let node = BracketRoundMatchNode()
             return node
         }
         
