@@ -21,6 +21,8 @@ final class BracketRoundMatchNode: ASCellNode {
     static let contentHeight: CGFloat = 75
     
     private let contentNode = ASDisplayNode()
+    private let matchNode = ASDisplayNode()
+    
     private let matchPosition: MatchPosition
     
     init(matchPosition: MatchPosition) {
@@ -32,7 +34,7 @@ final class BracketRoundMatchNode: ASCellNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        contentNode.style.preferredSize = CGSize(width: constrainedSize.max.width, height: BracketRoundMatchNode.contentHeight)
+        contentNode.style.preferredSize = CGSize(width: constrainedSize.max.width - 25, height: BracketRoundMatchNode.contentHeight)
         let centerSpec = ASCenterLayoutSpec(centeringOptions: .Y, sizingOptions: .minimumY, child: self.contentNode)
         centerSpec.style.preferredSize = CGSize(width: constrainedSize.max.width, height: BracketRoundMatchNode.height)
         let insetSpec = ASInsetLayoutSpec(insets: .zero, child: centerSpec)

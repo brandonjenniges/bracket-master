@@ -34,6 +34,7 @@ class BracketViewController: ASViewController<ASDisplayNode> {
     init() {
         super.init(node: self.mainNode)
         self.mainNode.pagerNode.dataSource = self
+        self.mainNode.pagerNode.delegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -91,18 +92,19 @@ class BracketViewController: ASViewController<ASDisplayNode> {
         
         if  recognizer.state == .began {
             
+            // Don't do anything if x is 0
+            if translation.x == 0 {
+                return
+            }
+            
             let newValue: Int
-            if translation.x >= 0 {
-                print("left")
+            if translation.x > 0 {
                 if self.currentPage.value == 0 {
-                    // Tried to swipe left on first page
                     return
                 }
                 newValue = self.currentPage.value - 1
             } else {
-                print("right")
                 if self.currentPage.value == self.rounds.count - 1 {
-                    // Tried to swipe right on last page
                     return
                 }
                 newValue = self.currentPage.value + 1
@@ -113,7 +115,7 @@ class BracketViewController: ASViewController<ASDisplayNode> {
             
             UIView.animate(withDuration: 0.3, animations: {
                 self.roundDidChange(newActive, scrollView: newActive.mainNode.collectionNode.view)
-                self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: newValue, section: 0), at: .left, animated: false)
+                self.mainNode.pagerNode.scrollToItem(at: IndexPath(row: newValue, section: 0), at: .left, animated: true)
             }, completion: { (finished) in
             })
         }
@@ -124,10 +126,19 @@ class BracketViewController: ASViewController<ASDisplayNode> {
 extension BracketViewController: BracketRoundSrollDelegate {
     
     func roundDidScroll(_ controller: BracketRoundViewController, scrollView: UIScrollView) {
-        for round in self.rounds {
+        for (index, round) in self.rounds.enumerated() {
+            
+            // Skip older or not yet visible rounds
+            if index < self.currentPage.value || index > self.currentPage.value + 1 {
+                continue
+            }
+            
+            // Ignore updating the round that scrolled, this would cause looping
             if round == controller {
                 continue
             }
+            
+            // Update round that is upcoming so that the offset matches the current round's scrolling
             let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
             round.mainNode.collectionNode.setContentOffset(newOffset, animated: false)
@@ -136,28 +147,28 @@ extension BracketViewController: BracketRoundSrollDelegate {
     }
     
     func roundDidChange(_ controller: BracketRoundViewController, scrollView: UIScrollView) {
-        for round in self.rounds {
+        for (index, round) in self.rounds.enumerated() {
+    
+            // Skip older or not yet visible rounds
+            if index < self.currentPage.value || index > self.currentPage.value + 1 {
+                continue
+            }
+            
+            // Update the new current round to have the correct normal layout
             if round == controller {
                 round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: true)
                 continue
             }
+            
+            // Handle upcoming round coming into focus, correct it's content offset and update the collection layout to the spaced layout
             let additionalOffset: CGFloat = round.viewingStatus.value == .trailing ? 0 : -(BracketRoundMatchNode.height / 2)
             let newOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + additionalOffset)
         
             UIView.animate(withDuration: 0.3, animations: {
-                switch round.viewingStatus.value {
-                case .leading:
-                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.spacedLayout, animated: false)
-                    break
-                case .trailing:
-                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: false)
-                    break
-                case .current:
-                    round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.collectionLayout, animated: false)
-                    break
-                }
+                round.mainNode.collectionNode.view.setCollectionViewLayout(round.mainNode.spacedLayout, animated: false)
                 round.mainNode.collectionNode.contentOffset = newOffset
             }, completion: { (finished) in
+                // clean up to make sure offset is correct after animation finishes
                 if finished {
                     round.mainNode.collectionNode.contentOffset = newOffset
                 }
@@ -177,6 +188,14 @@ extension BracketViewController: ASCollectionDataSource, ASCollectionDelegate {
                 return self.rounds[indexPath.item]
             }, didLoad: nil)
         }
+    }
+    
+    func collectionNode(_ collectionNode: ASCollectionNode, constrainedSizeForItemAt indexPath: IndexPath) -> ASSizeRange {
+        if indexPath.item == self.rounds.count - 1 {
+            return ASSizeRange(min: self.view.bounds.size, max: self.view.bounds.size)
+        }
+        let offsetSize = CGSize(width: self.view.bounds.size.width * self.mainNode.OFFSET_PERCENT, height: self.view.bounds.size.height)
+        return ASSizeRange(min: offsetSize, max: offsetSize)
     }
 }
 
